@@ -152,23 +152,52 @@ form {
   background-color: transparent;
 }
 
-.searchBox {
+.searchInput {
   border: none !important;
   border-radius: 0 !important;
   border-bottom: 2px solid #fff5e3 !important;
   background-color: transparent !important;
 }
 
-.searchBox::placeholder {
+.searchInput::placeholder {
   color: #fff5e3 !important;
 }
 
-.searchBox:focus {
+.searchInput:focus {
   outline: none !important;
 }
 
 .searchBoxImg {
   border-bottom: 2px solid #fff5e3;
+}
+
+.autoComplete {
+  position: absolute;
+  width: 92%;
+  background-color: white;
+  color: black;
+  text-align: left;
+  border-radius: 5px;
+  z-index: 10;
+}
+.autoComplete div:first-child {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.autoComplete div:last-child {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.searchResult {
+  padding: 8px 0px 8px 8px;
+}
+
+.searchResult:hover {
+  background-color: #dedede;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .currentWeather .currentTemp {
@@ -189,13 +218,28 @@ form {
 
 .airQualityScale {
   font-family: "Heebo", sans-serif !important;
-  margin: 0;
+  font-size: 0.8em;
+  color: #fff5e3;
+  overflow: visible;
+  padding: 0;
+  /*   margin: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   margin-left: 35px;
   padding: 0;
-  font-size: 0.8em;
+  */
+}
+
+#airQualityDialog {
+  width: 90%;
+  padding: 5px;
+  background-color: #2e2e2e;
+  border: none;
+  border-radius: 5px;
+  filter: drop-shadow(0px 0px 3px #999999);
+  margin-top: 5px;
+  z-index: 10;
 }
 
 .chart {
@@ -228,12 +272,31 @@ form {
   display: block;
 }
 
+@media (max-width: 767px) {
+  .autoComplete {
+    width: 90%;
+  }
+}
+
+@media (max-width: 550px) {
+  .autoComplete {
+    width: 93%;
+    margin-left: -17px;
+  }
+  .input-group {
+    padding: 0px !important;
+  }
+}
+
 @media (max-width: 992px) {
   .airQualityScale {
     justify-content: center;
   }
   .col-lg-3 {
     border-bottom-color: #fff5e3 !important;
+  }
+  .autoComplete {
+    left: 28px;
   }
 }
 

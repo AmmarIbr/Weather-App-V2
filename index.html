@@ -20,11 +20,15 @@
             <div class="col-lg-3 border rounded-5 text-center pt-5">
                 <form action="">
                     <div class="input-group mb-3 ps-3 pe-3">
-                        <input type="text" class="form-control searchBox shadow-none" placeholder="Search Location"
+                        <input type="text" class="form-control searchInput shadow-none" placeholder="Search Location"
                             aria-label="Search Location" aria-describedby="basic-addon1">
                         <img src="./images/search.svg" alt="" width="24" class="searchBoxImg">
                     </div>
                 </form>
+                <section class="autoComplete">
+
+                </section>
+                <h3 class="currentLocation">Location, Location</h3>
                 <section class="currentWeather ">
                     <div class="currentTemp mt-5">
 
@@ -43,19 +47,19 @@
                             Details</button>
                     </div>
                     <dialog id="airQualityDialog">
-                        <section class="airQualityScale mt-3">
+                        <section class="airQualityScale mt-3 d-flex justify-content-around">
                             <div class="me-2 d-flex flex-column">
                                 <p class="align-self-start">1 - Good</p>
                                 <p class="align-self-start">2 - Moderate</p>
                                 <p class="align-self-start">3 - Sensitive</p>
                             </div>
-                            <div class="ms-2 d-flex flex-column">
+                            <div class="d-flex flex-column">
                                 <p class="align-self-start">4 - Unhealthy</p>
                                 <p class="align-self-start">5 - Very Unhealthy</p>
                                 <p class="align-self-start">6 - Hazardous</p>
                             </div>
                         </section>
-                        <button class="closeDialog">OK.</button>
+                        <button class="closeDialog btn btn-secondary btn-sm badge">OK.</button>
                     </dialog>
                 </section>
 

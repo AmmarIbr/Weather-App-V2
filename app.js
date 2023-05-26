@@ -1,5 +1,4 @@
 const toggleWeek = document.querySelector('.toggleWeek')
-/* const toggleWeekTwo = document.querySelector('.toggleWeekTwo') */
 const openDialog = document.querySelector('.openDialog')
 const closeDialog = document.querySelector('.closeDialog')
 const airQualityDialog = document.querySelector('#airQualityDialog')
@@ -9,18 +8,23 @@ const feelsLike = document.querySelector('.feelsLike')
 const currentWind = document.querySelector('.currentWind')
 const airQualityInfo = document.querySelector('.airQualityInfo')
 const currentCondition = document.querySelector('.currentCondition')
+const currentLocation = document.querySelector('.currentLocation')
+const autoComplete = document.querySelector('.autoComplete')
+const searchInput = document.querySelector('.searchInput')
+const form = document.querySelector('FORM')
+const searchResult = document.querySelector('.searchResult')
 
 
 
 
 
 async function getIp() {
+
     const ipConfig = { params: { q: "auto:ip" } };
     const ipRes = await axios.get(
         `https://api.weatherapi.com/v1/ip.json?key=30832b5a2a13422485f64334231003`,
         ipConfig
     );
-    console.log(ipRes.data);
     getCurrentDate()
     getCurrentWeather(ipRes.data.ip)
     getForecastWeather(ipRes.data.ip)
@@ -43,6 +47,55 @@ async function getIp() {
         condition.textContent = res.data.current.condition.text; */
 }
 
+async function autoSuggesstion() {
+    autoComplete.innerText = ''
+    if (searchInput.value.length > 3) {
+        let suggesstedLocations = await searchRequest(searchInput.value)
+        console.log(suggesstedLocations)
+        for (let location of suggesstedLocations) {
+            console.log(location)
+            showSuggestions(location)
+        }
+    }
+
+
+
+}
+
+async function searchRequest(inputValue) {
+    try {
+        const config = { params: { q: inputValue } };
+        const res = await axios.get(
+            `https://api.weatherapi.com/v1/search.json?key=30832b5a2a13422485f64334231003`,
+            config
+        );
+        console.log(res.data)
+        /*         if (res.data.length > 4) {
+                    return res.data.slice[0, 4];
+                } */
+        return res.data
+    } catch (e) {
+        console.log("Error making request:", e);
+    }
+}
+
+function showSuggestions(value) {
+    let divElement = document.createElement("div");
+    divElement.classList.add("searchResult", "active");
+    autoComplete.append(divElement);
+    if (value.country === 'United States of America') {
+        divElement.textContent = `${value.name}, ${value.region}, USA`;
+    } else if (value.region === '') {
+        divElement.textContent = `${value.name}, ${value.country}`;
+    } else {
+        divElement.textContent = `${value.name}, ${value.region}, ${value.country}`;
+    }
+}
+
+function selectLocation() {
+    console.log('hello')
+}
+
 function getCurrentDate() {
     let date = new Date();
     /* console.log(date.getMonth()) */
@@ -62,7 +115,9 @@ function getCurrentDate() {
     if (min < 10) {
         min = `0${min}`;
     }
-    currentTime.textContent = `${month[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} ${hour}:${min} ${amOrpm}`;
+
+    currentDate = `${month[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()} ${hour}:${min} ${amOrpm}`;
+    currentTime.textContent = currentDate
 }
 
 async function getCurrentWeather(location) {
@@ -76,13 +131,19 @@ async function getCurrentWeather(location) {
     airQuality = Object.values(current.air_quality)[Object.keys(current.air_quality).length - 2]
     airQualityInfo.innerText = `Air Quality: ${airQuality}`
     currentCondition.innerText = `${current.condition.text}`
+    if (response.data.location.region === response.data.location.name) {
+        currentLocation.innerText = `${response.data.location.name}, ${response.data.location.country}`
+    } else if (response.data.location.region === '') {
+        currentLocation.innerText = `${response.data.location.name}, ${response.data.location.country}`
+    } else {
+        currentLocation.innerText = `${response.data.location.name}, ${response.data.location.region}, ${response.data.location.country}`
+    }
 
 }
 
 async function getForecastWeather(location) {
     const config = { params: { q: 'Dubai', aqi: 'yes', alerts: 'yes' } }
     const response = await axios.get('https://api.weatherapi.com/v1/forecast.json?key=30832b5a2a13422485f64334231003', config)
-    console.log(response.data)
     setAlerts(response.data.alerts)
     hourlyForecast = response.data.forecast.forecastday[0].hour
     let currentChartData = []
@@ -94,8 +155,6 @@ async function getForecastWeather(location) {
 }
 
 async function getTwoWeekData(lat, long) {
-    console.log(lat)
-    console.log(long)
     const config = { params: { latitude: lat, longitude: long, timezone: 'auto', daily: 'temperature_2m_max,temperature_2m_min', forecast_days: 14 } }
     const twoWeekData = await axios.get(`https://api.open-meteo.com/v1/forecast`, config)
     weekOneMax = twoWeekData.data.daily.temperature_2m_max.slice(0, 7)
@@ -195,6 +254,10 @@ function getCurrentChart(currentChartData) {
 }
 
 function getWeekOneChart(max, min) {
+    let weekOneDates = []
+    for (let i = 0; i < 7; i++) {
+        weekOneDates.push(`${moment()._locale._monthsShort[moment().add(i, 'days').month()]} ${moment().add(i, 'days').date()}`)
+    }
     let options = {
         chart: {
             height: 500,
@@ -232,7 +295,7 @@ function getWeekOneChart(max, min) {
         ],
         colors: ['#4890FF', '#f7bc4d'],
         xaxis: {
-            categories: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+            categories: weekOneDates,
             labels: {
                 style: { colors: '#fff5e3' }
             },
@@ -245,7 +308,7 @@ function getWeekOneChart(max, min) {
             labels: {
                 style: { colors: '#fff5e3' }
             },
-            tickAmount: 10,
+            tickAmount: 8,
             forceNiceScale: true
         },
         stroke: {
@@ -262,10 +325,9 @@ function getWeekOneChart(max, min) {
             show: true,
             xaxis: {
                 lines: {
-                    show: true
+                    show: false
                 }
             },
-            opacity: 0.5
         },
         legend: {
             show: true,
@@ -285,6 +347,11 @@ function getWeekOneChart(max, min) {
 }
 
 function getWeekTwoChart(max, min) {
+    let weekTwoDates = []
+    for (let i = 7; i < 14; i++) {
+        weekTwoDates.push(`${moment()._locale._monthsShort[moment().add(i, 'days').month()]} ${moment().add(i, 'days').date()}`)
+    }
+
     let options = {
         chart: {
             height: 500,
@@ -322,7 +389,7 @@ function getWeekTwoChart(max, min) {
         ],
         colors: ['#4890FF', '#f7bc4d'],
         xaxis: {
-            categories: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+            categories: weekTwoDates,
             labels: {
                 style: { colors: '#fff5e3' }
             },
@@ -333,7 +400,9 @@ function getWeekTwoChart(max, min) {
         yaxis: {
             labels: {
                 style: { colors: '#fff5e3' }
-            }
+            },
+            tickAmount: 6,
+            forceNiceScale: true
         },
         stroke: {
             curve: 'smooth'
@@ -365,6 +434,8 @@ function getWeekTwoChart(max, min) {
 
 }
 
+
+
 toggleWeek.addEventListener('click', () => {
     const weekOne = document.querySelector('.weekOne')
     const weekTwo = document.querySelector('.weekTwo')
@@ -386,3 +457,9 @@ closeDialog.addEventListener('click', () => {
 });
 
 addEventListener('DOMContentLoaded', getIp)
+
+searchInput.addEventListener("input", autoSuggesstion);
+
+form.addEventListener("submit", (e) => e.preventDefault());
+
+searchResult.addEventListener('click', selectLocation)
