@@ -12,9 +12,54 @@ const currentLocation = document.querySelector('.currentLocation')
 const autoComplete = document.querySelector('.autoComplete')
 const searchInput = document.querySelector('.searchInput')
 const form = document.querySelector('FORM')
+const container = document.querySelector('.container')
 
+const conditionCodes = {
+    cloudy: [1003, 1006, 1009],
+    foggy: [1030, 1135, 1147],
+    rain: [1063, 1150, 1153, 1180, 1183, 1186, 1189, 1192, 1195, 1240, 1243, 1246],
+    snow: [1066, 1114, 1210, 1213, 1216, 1219, 1222, 1225, 1255, 1258],
+    freezingRain: [1069, 1150, 1168, 1171, 1198, 1204, 1207, 1237, 1249, 1252, 1261, 1264],
+    thunderWithRain: [1273, 1276],
+    thunderWithSnow: [1279, 1282],
+}
 
+function setBackgroundImage(condition) {
+    const { code, text } = condition
 
+    if (code === 1000 && text === 'Sunny') {
+        container.style.backgroundImage = "url('./images/conditions/sunny.jpg')";
+    } else if (code === 1000 && text === 'Clear') {
+        container.style.backgroundImage = "url('./images/conditions/night\ time\ no\ clouds.jpg')";
+    } else if (code === 1117) {
+        container.style.backgroundImage = "url('./images/conditions/blizzard.jpg')";
+    } else if (codeCheck(conditionCodes.cloudy, code)) {
+        container.style.backgroundImage = "url('./images/conditions/sunny\ with\ clouds.jpg')";
+    } else if (codeCheck(conditionCodes.foggy, 1030)) {
+        container.style.backgroundImage = "url('./images/conditions/foggy\ day.jpg')";
+    } else if (codeCheck(conditionCodes.rain, code)) {
+        container.style.backgroundImage = "url('./images/conditions/heavy\ rain.jpg')";
+    } else if (codeCheck(conditionCodes.snow, code)) {
+        container.style.backgroundImage = "url('./images/conditions/heavy\ snow.jpg')";
+    } else if (codeCheck(conditionCodes.freezingRain, code)) {
+        container.style.backgroundImage = "url('./images/conditions/freezing\ rain.jpg')";
+    } else if (codeCheck(conditionCodes.thunderWithRain, code)) {
+        container.style.backgroundImage = "url('./images/conditions/thunder\ snow.jpg')";
+    } else if (codeCheck(conditionCodes.thunderWithSnow, code)) {
+        container.style.backgroundImage = "url('./images/conditions/thunder\ snow.jpg')";
+    } else {
+        container.style.backgroundImage = "url('./images/conditions/unknown.jpg')";
+        //bad image, look for replacement
+    }
+
+}
+
+function codeCheck(condition, code) {
+    for (let value of condition) {
+        if (value === code) return true
+    }
+    return false
+}
 
 
 async function getIp() {
@@ -27,23 +72,6 @@ async function getIp() {
     getCurrentDate()
     getCurrentWeather(ipRes.data.ip)
     getForecastWeather(ipRes.data.ip)
-
-    /*     const config = { params: { q: ipRes.data.ip } };
-        const res = await axios.get(
-          `https://api.weatherapi.com/v1/current.json?key=30832b5a2a13422485f64334231003`,
-          config
-        );
-        setCurrentWeather(res.data.current);
-        h1.textContent = `${ipRes.data.city}, ${ipRes.data.country_name}`;
-        setIcon(res.data.current);
-        setOtherDetails(res.data.current);
-        displayTemp.innerText = `${res.data.current.temp_c}°`;
-        celsius.textContent = "C";
-        celsius.classList.add("celsius");
-        displayTemp.appendChild(celsius);
-        // celsius.textContent = "C";
-        feel.textContent = `Feels Like ${res.data.current.feelslike_c}°`;
-        condition.textContent = res.data.current.condition.text; */
 }
 
 async function autoSuggesstion() {
@@ -56,9 +84,6 @@ async function autoSuggesstion() {
             showSuggestions(location)
         }
     }
-
-
-
 }
 
 async function searchRequest(inputValue) {
@@ -156,9 +181,12 @@ async function getForecastWeather(location) {
     for (let hour of hourlyForecast) {
         currentChartData.push(hour.temp_c)
     }
-
     getCurrentChart(currentChartData)
+    setBackgroundImage(response.data.current.condition)
 }
+
+
+
 
 async function getTwoWeekData(lat, long) {
     const config = { params: { latitude: lat, longitude: long, timezone: 'auto', daily: 'temperature_2m_max,temperature_2m_min', forecast_days: 14 } }

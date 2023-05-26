@@ -136,7 +136,6 @@ body {
 }
 
 .container {
-  background-image: url("./images/container.jpg") !important;
   background-size: cover;
   border-color: transparent !important;
 }
