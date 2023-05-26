@@ -12,7 +12,6 @@ const currentLocation = document.querySelector('.currentLocation')
 const autoComplete = document.querySelector('.autoComplete')
 const searchInput = document.querySelector('.searchInput')
 const form = document.querySelector('FORM')
-const searchResult = document.querySelector('.searchResult')
 
 
 
@@ -90,10 +89,17 @@ function showSuggestions(value) {
     } else {
         divElement.textContent = `${value.name}, ${value.region}, ${value.country}`;
     }
+
 }
 
-function selectLocation() {
-    console.log('hello')
+function selectLocation(e) {
+    searchInput.value = ''
+    let searchResult = document.querySelectorAll('.searchResult')
+    searchResult.forEach((element) => {
+        element.remove()
+    })
+    getCurrentWeather(e.target.textContent)
+    getForecastWeather(e.target.textContent)
 }
 
 function getCurrentDate() {
@@ -121,7 +127,7 @@ function getCurrentDate() {
 }
 
 async function getCurrentWeather(location) {
-    const config = { params: { q: 'Dubai', aqi: 'yes' } }
+    const config = { params: { q: location, aqi: 'yes' } }
     const response = await axios.get('https://api.weatherapi.com/v1/current.json?key=30832b5a2a13422485f64334231003', config)
     getTwoWeekData(response.data.location.lat, response.data.location.lon)
     const { current } = response.data
@@ -142,7 +148,7 @@ async function getCurrentWeather(location) {
 }
 
 async function getForecastWeather(location) {
-    const config = { params: { q: 'Dubai', aqi: 'yes', alerts: 'yes' } }
+    const config = { params: { q: location, aqi: 'yes', alerts: 'yes' } }
     const response = await axios.get('https://api.weatherapi.com/v1/forecast.json?key=30832b5a2a13422485f64334231003', config)
     setAlerts(response.data.alerts)
     hourlyForecast = response.data.forecast.forecastday[0].hour
@@ -462,4 +468,4 @@ searchInput.addEventListener("input", autoSuggesstion);
 
 form.addEventListener("submit", (e) => e.preventDefault());
 
-searchResult.addEventListener('click', selectLocation)
+autoComplete.addEventListener('click', selectLocation)
